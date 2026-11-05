@@ -70,7 +70,7 @@ Set `CORE_URL` and `CORE_REGISTRATION_KEY` and Wallet joins the box: people sign
 |---|---|---|
 | Pocket Travel | files a pass with the trip it falls in; the pass shows its trip | `trips:read` |
 | Pocket Calendar | a ticket or flight as an event with the place, seat and a link to the pass; moved when the gate or time changes | `calendar:read`, `calendar:write` |
-| Pocket Email | adds the .pkpass files that arrive by email, every two hours | `mail:read` |
+| Pocket Email | adds the .pkpass files that arrive by email, every two hours | `mail:passes` (only those files) |
 | Pocket Money | a loyalty card shows what you spent at that shop in the last 90 days | `transactions:read` |
 | Pocket AI | reads a pasted booking email into a pass; the Ask button on every page | inference |
 

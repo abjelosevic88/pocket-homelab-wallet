@@ -29,7 +29,7 @@ type mailResult struct {
 
 func (s *Server) scanMail(ctx context.Context, uid int64, st store.Settings) mailResult {
 	res := mailResult{Added: []*store.Card{}}
-	conn, err := s.clients(ctx, uid).conn(ctx, appEmail, scopeMailRead)
+	conn, err := s.clients(ctx, uid).conn(ctx, appEmail, scopeMailPasses)
 	if err != nil {
 		res.Detail = err.Error()
 		return res

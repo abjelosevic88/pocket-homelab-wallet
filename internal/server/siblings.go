@@ -26,7 +26,7 @@ const (
 	scopeTripsRead     = "trips:read"
 	scopeCalendarRead  = "calendar:read"
 	scopeCalendarWrite = "calendar:write"
-	scopeMailRead      = "mail:read"
+	scopeMailPasses    = "mail:passes"
 	scopeTxRead        = "transactions:read"
 )
 
@@ -40,7 +40,7 @@ type pocketApp struct {
 var (
 	appTravel   = pocketApp{"travel", "Pocket Travel", []string{scopeTripsRead}, "File your tickets and boarding passes with the trip they are for, and show them by trip"}
 	appCalendar = pocketApp{"calendar", "Pocket Calendar", []string{scopeCalendarRead, scopeCalendarWrite}, "Put your tickets and flights on your calendar with the place and seat, and move them when they change"}
-	appEmail    = pocketApp{"email", "Pocket Email", []string{scopeMailRead}, "Add the tickets and boarding passes (.pkpass files) that airlines, venues and shops send you by email"}
+	appEmail    = pocketApp{"email", "Pocket Email", []string{scopeMailPasses}, "Add the tickets and boarding passes (.pkpass files) that airlines, venues and shops send you by email"}
 	appMoney    = pocketApp{"money", "Pocket Money", []string{scopeTxRead}, "Show what you spent at a shop on its loyalty card, so you see which cards are worth keeping"}
 	pocketApps  = []pocketApp{appTravel, appCalendar, appEmail, appMoney}
 )

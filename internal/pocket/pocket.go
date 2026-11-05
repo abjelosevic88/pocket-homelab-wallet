@@ -316,11 +316,11 @@ type MailFile struct {
 // MailPasses lists the .pkpass files in the person's email, newest first.
 func (c *Client) MailPasses(ctx context.Context, limit int) ([]MailFile, error) {
 	var raw json.RawMessage
-	q := url.Values{"q": {".pkpass"}, "limit": {fmt.Sprint(limit)}}
-	if err := c.do(ctx, http.MethodGet, "/api/v1/attachments", q, nil, &raw); err != nil {
+	q := url.Values{"limit": {fmt.Sprint(limit)}}
+	if err := c.do(ctx, http.MethodGet, "/api/v1/passes", q, nil, &raw); err != nil {
 		return nil, err
 	}
-	all, err := list[MailFile](raw, "attachments")
+	all, err := list[MailFile](raw, "passes")
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +335,7 @@ func (c *Client) MailPasses(ctx context.Context, limit int) ([]MailFile, error) 
 
 // MailFileData downloads one attachment (at most 10 MB).
 func (c *Client) MailFileData(ctx context.Context, id int64) ([]byte, error) {
-	b, _, err := c.raw(ctx, fmt.Sprintf("/api/v1/attachments/%d", id), url.Values{"download": {"1"}}, 10<<20)
+	b, _, err := c.raw(ctx, fmt.Sprintf("/api/v1/passes/%d", id), nil, 10<<20)
 	return b, err
 }
 
