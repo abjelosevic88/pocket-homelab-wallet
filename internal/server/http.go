@@ -107,6 +107,7 @@ func (s *Server) Router() http.Handler {
 			r.Post("/tokens", s.handleCreateToken)
 			r.Delete("/tokens/{id}", s.handleDeleteToken)
 
+			r.Get(strings.TrimPrefix(core.PortablePath, "/api/v1"), portable.Handler())
 			r.Get("/backup", s.handleBackup)
 			r.Get("/export.json", s.handleExportJSON)
 			r.Get("/export.csv", s.handleExportCSV)

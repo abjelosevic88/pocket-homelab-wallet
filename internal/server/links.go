@@ -21,6 +21,23 @@ var linkOffers = []core.Offer{
 	{Scope: "wallet:write", Name: "Add cards and passes", Description: "Add a card, ticket or boarding pass (also from a .pkpass file) and spend from a gift card. It may change or remove only what that app added itself."},
 }
 
+// portable is what Pocket Move may copy out and bring in for a person
+// (docs/move.md in pocket-homelab-core); Register adds move:export/import.
+// Both exports hold the person's own card numbers and codes, so they only
+// ever answer for the person the link acts for.
+var portable = &core.Portable{
+	Exports: []core.PortableExport{
+		{Path: "/api/v1/export.json", File: "wallet.json", Kind: core.KindPocket, Title: "Your cards, passes and IDs with their barcodes, pictures and gift card history"},
+		{Path: "/api/v1/export.csv", File: "wallet.csv", Kind: core.KindCSV, Title: "Your cards, passes and IDs as a table (no pictures)"},
+	},
+	Imports: []core.PortableImport{
+		{Path: "/api/v1/import", Kind: core.KindPocket, ContentType: "application/json", MaxBytes: 60 << 20, Title: "Adds the cards, passes and IDs from another box; cards you already have are left alone"},
+		{Path: "/api/v1/import", Kind: core.KindCSV, ContentType: "text/csv", MaxBytes: 60 << 20, Title: "Adds cards from a table with a name column; rows you already have are skipped"},
+		{Path: "/api/v1/import", Kind: "catima", ContentType: "application/zip", MaxBytes: 60 << 20, Title: "Adds the cards from a Catima export, with their pictures and groups"},
+		{Path: "/api/v1/import/pkpass", Kind: "pkpass", ContentType: "application/vnd.apple.pkpass", MaxBytes: 20 << 20, Title: "Adds an Apple Wallet pass (.pkpass or .pkpasses); a pass you already have is updated, not doubled"},
+	},
+}
+
 type linkRoute struct {
 	methods string
 	path    *regexp.Regexp
@@ -40,6 +57,9 @@ var errLinkScope = errors.New("outside the link's scope")
 
 // linkAllows reports whether a link token with these scopes may make this request.
 func linkAllows(scopes []string, r *http.Request) bool {
+	if portable.LinkAllows(scopes, r) {
+		return true
+	}
 	for _, lr := range linkRoutes {
 		if !strings.Contains(" "+lr.methods+" ", " "+r.Method+" ") || !lr.path.MatchString(r.URL.Path) {
 			continue

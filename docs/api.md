@@ -38,3 +38,5 @@ Everything is under `/api/v1`, JSON in and out, with a session cookie, a persona
 | `POST /mail/scan` | look for passes in Pocket Email now |
 
 Link tokens: `wallet:read` covers the reads above (not settings, export or the email look); `wallet:write` covers `POST /cards`, `PUT`/`DELETE /cards/{id}` of cards that app added, `POST /cards/{id}/balance` and `POST /import/pkpass`.
+
+Pocket Move can copy your cards, passes and IDs out (`move:export`: `GET /export.json`, `GET /export.csv`, `GET /pocket/portable`) and bring them in (`move:import`: `POST /import`, `POST /import/pkpass`), only ever your own.
