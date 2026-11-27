@@ -38,6 +38,16 @@ var portable = &core.Portable{
 	},
 }
 
+// capabilities are what Pocket Search, Pocket Day and Pocket Hub may ask
+// (docs/capabilities.md in pocket-homelab-core); Register adds the pocket:*
+// offers, each opens its one route (capabilities.go). No quick capture: a
+// card or a pass needs its form, and a gift card spend needs its card.
+var capabilities = core.Capabilities{
+	Search: &core.Searchable{What: "Your cards, passes and IDs, by name, shop or issuer, kind, place and notes (never by their numbers)", Kinds: searchKinds(), Bangs: []string{"wallet", "card"}},
+	Day:    &core.DayFeed{Label: "Wallet", One: "pass", Many: "passes", What: "The tickets and boarding passes for that day, the cards and IDs that expire that day and what you spent from gift cards"},
+	Widget: &core.Widget{Title: "Wallet", What: "Today's and tomorrow's tickets and boarding passes, the cards and IDs that expire in the next 60 days and what is left on your gift cards"},
+}
+
 type linkRoute struct {
 	methods string
 	path    *regexp.Regexp
@@ -57,7 +67,7 @@ var errLinkScope = errors.New("outside the link's scope")
 
 // linkAllows reports whether a link token with these scopes may make this request.
 func linkAllows(scopes []string, r *http.Request) bool {
-	if portable.LinkAllows(scopes, r) {
+	if portable.LinkAllows(scopes, r) || capabilities.LinkAllows(scopes, r) {
 		return true
 	}
 	for _, lr := range linkRoutes {

@@ -65,17 +65,18 @@ func fieldsJSON(f []Field) string {
 
 // CardFilter narrows a listing.
 type CardFilter struct {
-	Group    string // cards | passes | ids
-	Kind     string
-	Q        string
-	Tag      string
-	Archived string // "" active only | "only" | "all"
-	Pinned   bool
-	From, To string // passes starting on these days (YYYY-MM-DD, inclusive)
-	TripID   int64
-	Expiring string // runs out on or before this day (YYYY-MM-DD)
-	Sort     string // used | name | recent | starts | expires
-	Limit    int
+	Group     string // cards | passes | ids
+	Kind      string
+	Q         string
+	Tag       string
+	Archived  string // "" active only | "only" | "all"
+	Pinned    bool
+	From, To  string // passes starting on these days (YYYY-MM-DD, inclusive)
+	TripID    int64
+	Expiring  string // runs out on or before this day (YYYY-MM-DD)
+	ExpiresOn string // runs out on exactly this day (YYYY-MM-DD)
+	Sort      string // used | name | recent | starts | expires
+	Limit     int
 }
 
 // ListCards lists one person's cards.
@@ -121,6 +122,10 @@ func (s *Store) ListCards(ctx context.Context, uid int64, f CardFilter) ([]Card,
 	if f.Expiring != "" {
 		where = append(where, "expires_on <> '' AND expires_on <= ?")
 		args = append(args, f.Expiring)
+	}
+	if f.ExpiresOn != "" {
+		where = append(where, "expires_on = ?")
+		args = append(args, f.ExpiresOn)
 	}
 	if f.Tag != "" {
 		where = append(where, "(', ' || lower(tags) || ',') LIKE ?")
@@ -301,6 +306,27 @@ func (s *Store) AddBalance(ctx context.Context, uid, cardID, delta int64, note s
 // BalanceLog lists a gift card's history, newest first.
 func (s *Store) BalanceLog(ctx context.Context, uid, cardID int64) ([]BalanceEntry, error) {
 	rows, err := s.DB.QueryContext(ctx, `SELECT id, card_id, delta, balance, note, created_at FROM balance_log WHERE user_id = ? AND card_id = ? ORDER BY created_at DESC, id DESC`, uid, cardID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []BalanceEntry{}
+	for rows.Next() {
+		var e BalanceEntry
+		if err := rows.Scan(&e.ID, &e.CardID, &e.Delta, &e.Balance, &e.Note, &e.CreatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, e)
+	}
+	return out, rows.Err()
+}
+
+// BalanceLogBetween lists a person's balance entries kept from one moment
+// up to (not including) another, oldest first. from and to are UTC times
+// "2006-01-02T15:04:05"; the stored times carry seconds' fractions and a zone
+// letter, so the caller checks the exact moment again.
+func (s *Store) BalanceLogBetween(ctx context.Context, uid int64, from, to string) ([]BalanceEntry, error) {
+	rows, err := s.DB.QueryContext(ctx, `SELECT id, card_id, delta, balance, note, created_at FROM balance_log WHERE user_id = ? AND created_at >= ? AND created_at < ? ORDER BY created_at, id`, uid, from, to)
 	if err != nil {
 		return nil, err
 	}

@@ -210,10 +210,12 @@ func (s *Server) manifest() core.Manifest {
 		Description: "Your loyalty and membership cards, gift cards, tickets, boarding passes and ID cards in one place, ready to scan: barcodes shown full screen at the till or the gate, .pkpass passes from your email, flights and tickets on your calendar and with their trip, and a reminder before a passport or card runs out.",
 		Icon:        "/favicon.svg", Version: Version,
 		URL: s.cfg.CoreAppURL, PublicURL: s.cfg.BaseURL, HealthPath: "/healthz", EnvPrefix: "WALLET",
-		Publishes: eventTopics,
-		Offers:    linkOffers,
-		Portable:  portable,
-		Uses:      append(linkUses(), core.InferenceUse()),
+		Category:     "Money",
+		Publishes:    eventTopics,
+		Offers:       linkOffers,
+		Portable:     portable,
+		Capabilities: capabilities,
+		Uses:         append(linkUses(), core.InferenceUse()),
 	}
 	if s.cfg.BaseURL != "" {
 		m.OIDC = &core.OIDCRequest{RedirectURIs: []string{s.oidcCallbackURL()}}

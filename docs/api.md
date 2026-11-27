@@ -40,3 +40,15 @@ Everything is under `/api/v1`, JSON in and out, with a session cookie, a persona
 Link tokens: `wallet:read` covers the reads above (not settings, export or the email look); `wallet:write` covers `POST /cards`, `PUT`/`DELETE /cards/{id}` of cards that app added, `POST /cards/{id}/balance` and `POST /import/pkpass`.
 
 Pocket Move can copy your cards, passes and IDs out (`move:export`: `GET /export.json`, `GET /export.csv`, `GET /pocket/portable`) and bring them in (`move:import`: `POST /import`, `POST /import/pkpass`), only ever your own.
+
+## Pocket Search, Pocket Day and Pocket Hub
+
+Wallet answers three of the routes every Pocket app can offer (`docs/capabilities.md` in Pocket Core), so Pocket Search, Pocket Day and Pocket Hub find it on their own. Each has its own link scope that opens that one route and nothing else; a signed-in person or a personal token can call them too. Addresses (`url`) are paths in the app (`/cards/{id}`). None of them ever carries a card or document number, a barcode, a booking reference, a PIN or a security code, and the search never matches one.
+
+| Route | Scope | What |
+|---|---|---|
+| `GET /pocket/search?q&limit` | `pocket:search` | `{items}`: cards, passes and IDs whose name, shop or issuer, kind, place, tags or notes have every word of `q`, the closest first and the archive last. Each has `id`, `title`, `kind` (loyalty card, membership card, gift card, ticket, boarding pass, ID card, passport, driving licence, insurance card, card), `snippet` (issuer · when and where for a pass · when it expires · what is left on a gift card), `date` (a pass: its day) and `url` |
+| `GET /pocket/day/{date}?tz=` | `pocket:day` | `{date, summary, items}`: the tickets and boarding passes of that day (the same as `GET /day/{date}`, with `time`, `end` and the place or route in `sub`), the cards and IDs that expire that day (`kind: "expires"`) and what was spent from gift cards that day (`kind: "spent"`, `amount`, `currency`, the time in `tz`). `summary` is like "1 pass, Passport expires, 12.00 BAM spent from a gift card" |
+| `GET /pocket/widget` | `pocket:widget` | `{line, metrics, items, url}`: today's and tomorrow's tickets and boarding passes (`detail` "Tomorrow 07:15 · SJJ Sarajevo → VIE Vienna"), then what expires in the next 60 days ("Expires in 12 days"), then gift cards with money left ("38.00 BAM left"). `line` is "Boarding pass for tomorrow 07:15", "Passport expires in 40 days" or empty |
+
+There is no quick capture: a card or a pass needs its form.

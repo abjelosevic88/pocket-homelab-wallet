@@ -76,6 +76,8 @@ Set `CORE_URL` and `CORE_REGISTRATION_KEY` and Wallet joins the box: people sign
 
 Other apps can read your wallet (`wallet:read`: a trip's boarding passes in Pocket Travel, the day's tickets in Pocket Day's journal, passports and cards that run out in Pocket Renewals, "what's my seat?" in Pocket AI) or add for you (`wallet:write`: a card, a pass, a .pkpass, spending from a gift card; it may change only what it added). Events on the bus: `wallet.card_saved`, `wallet.card_removed`, `wallet.pass_today`, `wallet.pass_soon`, `wallet.expiring` — never with a document number in them. Without Core every connection can be made directly with a URL and a token; the Core-only choices stay visible, greyed out.
 
+Pocket Search and Pocket Hub find Wallet on their own, with nothing to set up in either: your cards, passes and IDs turn up in Search by name, shop, kind or notes (`!wallet konzum`, `!card passport`), and Hub shows a "Wallet" widget with today's and tomorrow's tickets and flights, what expires in the next 60 days and what is left on your gift cards. The wallet's day is offered the same way (Pocket Day keeps its own reading through `wallet:read` for now). Card and document numbers, barcodes and booking references never leave through these. The routes are in [docs/api.md](docs/api.md#pocket-search-pocket-day-and-pocket-hub).
+
 ## Develop
 
 ```sh

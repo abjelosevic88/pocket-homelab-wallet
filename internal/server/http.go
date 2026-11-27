@@ -60,6 +60,11 @@ func (s *Server) Router() http.Handler {
 			r.Get("/kinds", s.handleKinds)
 			r.Get("/tags", s.handleTags)
 
+			// what Pocket Search, Pocket Day and Pocket Hub ask (capabilities.go)
+			r.Get("/pocket/search", core.SearchHandler(s.pocketSearch))
+			r.Get("/pocket/day/{date}", core.DayHandler(s.pocketDay))
+			r.Get("/pocket/widget", core.WidgetHandler(s.pocketWidget))
+
 			// cards, passes and IDs
 			r.Get("/cards", s.handleListCards)
 			r.Post("/cards", s.handleCreateCard)
